@@ -1,6 +1,7 @@
 const fileList = document.querySelector(".file-list");
 const fileUploadBox = document.querySelector(".file-upload-box");
 const fileCompletedStatus = document.querySelector(".file-completed-status");
+const uploadedFiles = new Set(); // To keep track of uploaded file names
 
 let totalFiles = 0;
 let completedFiles = 0;
@@ -86,13 +87,13 @@ const handleFileUploading = (file, uniqueIdentifier) => {
 const handleSelectedFiles = (files) => {
   if (files.length === 0) return;
 
-  // Filter out non-image files
-  const imageFiles = [...files].filter((file) =>
-    file.type.startsWith("image/")
+  // Filter out non-image files and check for duplicates
+  const imageFiles = [...files].filter(
+    (file) => file.type.startsWith("image/") && !uploadedFiles.has(file.name)
   );
 
   if (imageFiles.length === 0) {
-    alert("Please select only image files.");
+    alert("Please select only new image files.");
     return;
   }
 
@@ -103,6 +104,7 @@ const handleSelectedFiles = (files) => {
     const fileItemHTML = createFileItemHTML(file, uniqueIdentifier);
     fileList.insertAdjacentHTML("afterbegin", fileItemHTML);
     handleFileUploading(file, uniqueIdentifier);
+    uploadedFiles.add(file.name); // Add the file name to the set
   });
 
   fileCompletedStatus.innerText = `${completedFiles} / ${totalFiles} files completed`;
